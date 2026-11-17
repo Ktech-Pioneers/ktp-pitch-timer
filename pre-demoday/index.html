@@ -124,6 +124,15 @@
     transition: color 0.4s, text-shadow 0.6s, opacity 0.4s;
   }
   /* 숫자마다 칸 너비를 고정해서 초가 바뀔 때 글자가 좌우로 흔들리지 않게 */
+  /* 숫자 뒤 어두운 바탕 — 오브 선이 숫자와 겹쳐도 읽히게 */
+  .time::before {
+    content: ''; position: absolute; left: 50%; top: 50%; z-index: -1;
+    width: 1500px; height: 420px; translate: -50% -50%;
+    background: radial-gradient(closest-side, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.45) 60%, transparent);
+    opacity: 0; transition: opacity 1.2s var(--ease);
+  }
+  body[data-state="running"] .time::before,
+  body[data-state="final"] .time::before { opacity: 1; }
   .time span { display: inline-block; width: 0.84em; text-align: center; }
   .time span.colon { width: 0.42em; translate: 0 -0.06em; }
   body[data-phase="qna"] .time { text-shadow: 0 0 60px rgba(70, 120, 255, 0.45); }
@@ -519,7 +528,7 @@
   function createOrb(canvas) {
     const ctx = canvas.getContext("2d");
     const N = 26, SHOT_MS = 950;
-    const api = { open: 1, heat: 0, qna: 0, collapse: 0, shootNow: false };
+    const api = { open: 1, heat: 0, qna: 0, collapse: 0, dim: 1, shootNow: false };
     let w = 0, h = 0, shotStart = -1e9, nextShot = 4000;
     const mix = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
 
@@ -543,7 +552,7 @@
       ctx.translate(cx, cy);
       ctx.rotate(-0.52);
       ctx.globalCompositeOperation = "lighter";
-      ctx.globalAlpha = 0.85;
+      ctx.globalAlpha = 0.85 * api.dim;
 
       for (let i = 0; i < N; i++) {
         const u = (i / N + time * 0.018) % 1;
@@ -584,7 +593,7 @@
       else if (!reduced && t > nextShot) { shotStart = t; nextShot = t + 7000 + Math.random() * 5000; }
       const sp = (t - shotStart) / SHOT_MS;
       const env = sp >= 0 && sp <= 1 ? Math.pow(Math.sin(Math.PI * Math.min(1, sp * 1.35)), 2) * (1 - sp * 0.4) : 0;
-      const s = 0.42 + 0.58 * env + 0.3 * api.collapse;
+      const s = (0.42 + 0.58 * env + 0.3 * api.collapse) * (0.1 + 0.9 * api.dim);
       const g = ctx.createLinearGradient(-R, 0, R, 0);
       g.addColorStop(0, "rgba(120,80,255,0)");
       g.addColorStop(0.3, `rgba(170,90,255,${0.5 * s})`);
@@ -649,6 +658,9 @@
     orb.heat = ease(orb.heat, body.dataset.state === "final" || done ? 1 : 0, k);
     orb.qna = ease(orb.qna, PHASES[phase].key === "qna" ? 1 : 0, k);
     orb.collapse = ease(orb.collapse, done ? 1 : 0, k);
+    // 진행 중(일시정지 포함)엔 숫자가 잘 보이게 오브를 절반 밝기로, 대기·TIME'S UP 화면에선 원래 밝기
+    const st = body.dataset.state;
+    orb.dim = ease(orb.dim, st === "running" || st === "final" ? 0.45 : 1, reduced ? 1 : 0.04);
     stars.frame(reduced ? 0 : t);
     orb.frame(t);
     requestAnimationFrame(loop);
