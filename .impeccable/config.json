@@ -1,0 +1,35 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "pre-demoday/index.html"
+        ],
+        "createdAt": "2026-11-17T02:52:11.976Z",
+        "reason": "brand key visual: user asked to follow ktp-rsvp pre-demoday KV, whose styles.css uses the same gradient title (.hero__event) and violet glows (.btn--primary, .hero__logo)"
+      },
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "pre-demoday/index.html"
+        ],
+        "createdAt": "2026-11-17T02:52:12.270Z",
+        "reason": "brand key visual: user asked to follow ktp-rsvp pre-demoday KV, whose styles.css uses the same gradient title (.hero__event) and violet glows (.btn--primary, .hero__logo)"
+      },
+      {
+        "rule": "radial-halo",
+        "value": "*",
+        "files": [
+          "pre-demoday/index.html"
+        ],
+        "createdAt": "2026-11-17T02:59:44.445Z",
+        "reason": "functional state signal: final-minute pulse + end flash carried over from existing networking-day timer (.heart/.flash); horizon radial copied from ktp-rsvp KV"
+      }
+    ]
+  }
+}
